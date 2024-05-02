@@ -80,19 +80,24 @@ def create_table(cursor):
     cursor.execute(create_query)
 
 
-# Function to insert data into table
-def insert_clubs(cursor, data):
+# Function to insert or update data in the table
+def insert_or_update_clubs(cursor, data):
     for club in data:
         columns = ', '.join(club.keys())
         placeholders = ', '.join(['%s'] * len(club))
         values = [club[key] for key in club.keys()]
         
+        # Generate the INSERT ... ON CONFLICT ... DO UPDATE query
         insert_query = f"""
             INSERT INTO clubs ({columns})
             VALUES ({placeholders})
+            ON CONFLICT (id) DO UPDATE
+            SET {', '.join([f"{column}=EXCLUDED.{column}" for column in club.keys() if column != 'id'])};
         """
         
         cursor.execute(insert_query, values)
+
+
 
 # Main function
 def main():
@@ -102,7 +107,7 @@ def main():
         conn = connect_to_db()
         cursor = conn.cursor()
         create_table(cursor)
-        insert_clubs(cursor, clubs_data)
+        insert_or_update_clubs(cursor, clubs_data)
         conn.commit()
         cursor.close()
         conn.close()
