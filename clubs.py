@@ -1,5 +1,5 @@
 # Function to create table
-def create_table(cursor):
+def create_clubs_table(cursor):
     # Create a list of column names and data types
     columns = {
         "club_id": "TEXT",
