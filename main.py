@@ -1,14 +1,20 @@
+import os
 import requests
 import psycopg2
+from dotenv import load_dotenv
 
-# Function to fetch data from API
+load_dotenv()
+
 def fetch_clubs():
-    url = "https://api.golf-course-database.com:8000/clubs"
-    response = requests.get(url, auth=("andrewwhite", "Hd3@j2Dmh3"))
+    url = os.getenv("API_URL")
+    username = os.getenv("API_USERNAME")
+    password = os.getenv("API_PASSWORD")
+    response = requests.get(f'{url}/clubs', auth=(username, password))
     if response.status_code == 200:
         return response.json()
     else:
         return None
+
 
 # Function to connect to PostgreSQL database
 def connect_to_db():
