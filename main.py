@@ -29,50 +29,85 @@ def connect_to_db():
 
 # Function to create table
 def create_table(cursor):
-    cursor.execute("""
+    # Create a list of column names and data types
+    columns = {
+        "club_id": "TEXT",
+        "club_name": "TEXT",
+        "club_membership": "TEXT",
+        "number_of_holes": "TEXT",
+        "address": "TEXT",
+        "city": "TEXT",
+        "state": "TEXT",
+        "country": "TEXT",
+        "postal_code": "TEXT",
+        "phone": "TEXT",
+        "fax": "TEXT",
+        "website": "TEXT",
+        "longitude": "FLOAT",
+        "latitude": "FLOAT",
+        "contact_name": "TEXT",
+        "contact_title": "TEXT",
+        "email_address": "TEXT",
+        "driving_range": "TEXT",
+        "putting_green": "TEXT",
+        "chipping_green": "TEXT",
+        "practice_bunker": "TEXT",
+        "motor_cart": "TEXT",
+        "pull_cart": "TEXT",
+        "golf_clubs_rental": "TEXT",
+        "club_fitting": "TEXT",
+        "pro_shop": "TEXT",
+        "golf_lessons": "TEXT",
+        "caddie_hire": "TEXT",
+        "restaurant": "TEXT",
+        "reception_hall": "TEXT",
+        "changing_room": "TEXT",
+        "lockers": "TEXT",
+        "lodging_on_site": "TEXT",
+        "last_update": "TIMESTAMP"
+    }
+    
+    # Create the SQL query
+    columns_str = ",\n".join([f"{column} {data_type}" for column, data_type in columns.items()])
+    create_query = f"""
         CREATE TABLE IF NOT EXISTS clubs (
             id SERIAL PRIMARY KEY,
-            name TEXT,
-            address TEXT,
-            city TEXT,
-            state TEXT,
-            country TEXT,
-            phone TEXT,
-            email TEXT
-            -- Add more columns as needed
+            {columns_str}
         )
-    """)
+    """
+
+    # Execute the query
+    cursor.execute(create_query)
+
 
 # Function to insert data into table
-def insert_data(cursor, data):
+def insert_clubs(cursor, data):
     for club in data:
-        cursor.execute("""
-            INSERT INTO clubs (name, address, city, state, country, phone, email)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (
-            club.get('name', ''),
-            club.get('address', ''),
-            club.get('city', ''),
-            club.get('state', ''),
-            club.get('country', ''),
-            club.get('phone', ''),
-            club.get('email', '')
-        ))
+        columns = ', '.join(club.keys())
+        placeholders = ', '.join(['%s'] * len(club))
+        values = [club[key] for key in club.keys()]
+        
+        insert_query = f"""
+            INSERT INTO clubs ({columns})
+            VALUES ({placeholders})
+        """
+        
+        cursor.execute(insert_query, values)
 
 # Main function
 def main():
     clubs_data = fetch_clubs()
-    print(clubs_data)
+    # print(clubs_data)
     if clubs_data:
-        return
         conn = connect_to_db()
         cursor = conn.cursor()
         create_table(cursor)
-        insert_data(cursor, clubs_data)
+        insert_clubs(cursor, clubs_data)
         conn.commit()
         cursor.close()
         conn.close()
         print("Data inserted successfully!")
+        return
     else:
         print("Failed to fetch data from API.")
 
