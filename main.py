@@ -12,6 +12,7 @@ password = os.getenv("API_PASSWORD")
 db_name = os.getenv("DB_NAME")
 db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
 
 # Function to connect to PostgreSQL database
 def connect_to_db():
@@ -19,8 +20,7 @@ def connect_to_db():
         dbname=db_name,
         user=db_user,
         password=db_password,
-        host="localhost",
-        port="5432"
+        host=db_host,
     )
     return conn
 
